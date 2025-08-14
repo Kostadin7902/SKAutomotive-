@@ -1,0 +1,2363 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK Automotive - Управление на автосервиз</title>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #34495e;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px 10px;
+            text-align: center;
+            background: #34495e;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .nav-tab.active {
+            background: #3498db;
+        }
+
+        .nav-tab:hover {
+            background: #2980b9;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section {
+            padding: 20px;
+        }
+
+        .section-title {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            margin: -20px -20px 20px -20px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        .btn:hover, .btn:active {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-success:hover, .btn-success:active {
+            background: #229954;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+        }
+
+        .btn-danger:hover, .btn-danger:active {
+            background: #c0392b;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+        }
+
+        .btn-warning:hover, .btn-warning:active {
+            background: #e67e22;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+        }
+
+        .btn-info:hover, .btn-info:active {
+            background: #138496;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-received { background: #ffeaa7; color: #2d3436; }
+        .status-in-progress { background: #74b9ff; color: white; }
+        .status-ready { background: #00b894; color: white; }
+        .status-delivered { background: #6c5ce7; color: white; }
+
+        .part-item, .repair-item, .client-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .repair-item:hover, .client-item:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .part-info, .repair-info, .client-info {
+            flex: 1;
+        }
+
+        .part-price, .repair-total {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #27ae60;
+            margin: 0 10px;
+        }
+
+        .summary {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .summary-total {
+            border-top: 2px solid white;
+            padding-top: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 95%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover, .close:active {
+            color: black;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .client-details {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .reminder-item {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .print-only {
+            display: none;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+            
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+                max-width: none;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            .print-only {
+                display: block !important;
+            }
+            
+            .page-break {
+                page-break-after: always;
+            }
+            
+            .print-header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            
+            .print-header h1 {
+                font-size: 24px;
+                margin-bottom: 5px;
+            }
+            
+            .print-header h2 {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+            
+            .print-section {
+                margin-bottom: 20px;
+            }
+            
+            .print-section h3 {
+                font-size: 14px;
+                margin-bottom: 10px;
+                border-bottom: 1px solid #000;
+            }
+            
+            .print-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 5px;
+            }
+            
+            .print-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 15px;
+            }
+            
+            .print-table th, .print-table td {
+                border: 1px solid #000;
+                padding: 5px;
+                text-align: left;
+            }
+            
+            .print-table th {
+                background-color: #f0f0f0;
+                font-weight: bold;
+            }
+            
+            .print-total {
+                font-weight: bold;
+                font-size: 14px;
+            }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+                font-size: 16px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .form-section {
+                padding: 15px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .form-group {
+                min-width: auto;
+            }
+
+            .part-item, .repair-item, .client-item {
+                flex-direction: column;
+                text-align: left;
+                gap: 10px;
+            }
+            
+            .part-price, .repair-total {
+                margin: 10px 0;
+                align-self: flex-start;
+            }
+
+            .btn {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .nav-tab {
+                font-size: 12px;
+                padding: 12px 8px;
+                min-width: 100px;
+            }
+
+            .modal-content {
+                margin: 2% auto;
+                width: 98%;
+                max-height: 96vh;
+                padding: 15px;
+            }
+
+            .summary-row {
+                font-size: 0.9em;
+            }
+        }
+
+        /* Touch improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .btn {
+                min-height: 48px;
+                font-size: 16px;
+            }
+
+            .form-group input, 
+            .form-group textarea, 
+            .form-group select {
+                min-height: 48px;
+                font-size: 16px;
+            }
+
+            .nav-tab {
+                min-height: 48px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 SK AUTOMOTIVE</h1>
+            <p>Професионален автосервиз с клиентска база</p>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('repair')">📝 Нов ремонт</button>
+            <button class="nav-tab" onclick="showTab('clients')">👥 Клиенти</button>
+            <button class="nav-tab" onclick="showTab('repairs')">🔧 Ремонти</button>
+            <button class="nav-tab" onclick="showTab('reports')">📊 Отчети</button>
+            <button class="nav-tab" onclick="showTab('reminders')">⏰ Напомняния</button>
+        </div>
+
+        <!-- Repair Tab -->
+        <div id="repair-tab" class="tab-content active">
+            <div class="form-section">
+                <div class="section-title">🚙 ИНФОРМАЦИЯ ЗА АВТОМОБИЛА</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Регистрационен номер:</label>
+                        <input type="text" id="regNumber" placeholder="Въведете рег. номер" oninput="searchExistingClient()">
+                        <div id="clientSuggestions" style="display: none; border: 1px solid #ddd; border-top: none; background: white; max-height: 200px; overflow-y: auto;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>VIN номер:</label>
+                        <input type="text" id="vinNumber" placeholder="Въведете VIN номер">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Собственик:</label>
+                        <input type="text" id="owner" placeholder="Име на собственика">
+                    </div>
+                    <div class="form-group">
+                        <label>Телефон:</label>
+                        <input type="tel" id="phone" placeholder="Телефонен номер">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Километри:</label>
+                        <input type="number" id="kilometers" placeholder="Километраж">
+                    </div>
+                    <div class="form-group">
+                        <label>Статус на ремонта:</label>
+                        <select id="repairStatus">
+                            <option value="received">Приет</option>
+                            <option value="in-progress">В работа</option>
+                            <option value="ready">Готов</option>
+                            <option value="delivered">Предаден</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Дата на ремонт:</label>
+                        <input type="date" id="repairDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Очаквана дата за готовност:</label>
+                        <input type="date" id="expectedDate">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Оплакване/Проблем:</label>
+                        <textarea id="complaint" placeholder="Описание на проблема" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Забележки:</label>
+                        <textarea id="notes" placeholder="Допълнителни забележки" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Части и материали -->
+            <div class="form-section">
+                <div class="section-title">🔧 ЧАСТИ И МАТЕРИАЛИ</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Описание на частта:</label>
+                        <input type="text" id="partDescription" placeholder="Описание">
+                    </div>
+                    <div class="form-group">
+                        <label>Каталожен номер:</label>
+                        <input type="text" id="partNumber" placeholder="Номер на частта">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Доставчик:</label>
+                        <input type="text" id="partSupplier" placeholder="Име на доставчика">
+                    </div>
+                    <div class="form-group">
+                        <label>Дребна цена (лв.):</label>
+                        <input type="number" id="retailPrice" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Едра цена (лв.):</label>
+                        <input type="number" id="wholesalePrice" step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Крайна цена (лв.):</label>
+                        <input type="number" id="finalPrice" step="0.01" placeholder="0.00" readonly>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="addPart()">Добави част</button>
+                
+                <div id="partsList"></div>
+            </div>
+
+            <!-- Труд -->
+            <div class="form-section">
+                <div class="section-title">⚙️ ТРУД</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Часове работа:</label>
+                        <input type="number" id="hoursWorked" step="0.1" placeholder="0.0" oninput="calculateLabor()">
+                    </div>
+                    <div class="form-group">
+                        <label>Цена за час (лв.):</label>
+                        <input type="number" id="hourlyRate" step="0.01" placeholder="0.00" oninput="calculateLabor()">
+                    </div>
+                    <div class="form-group">
+                        <label>Общо труд (лв.):</label>
+                        <input type="number" id="totalLabor" step="0.01" placeholder="0.00" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Резюме -->
+            <div class="summary" id="summary">
+                <h3>💰 ФИНАНСОВО РЕЗЮМЕ</h3>
+                <div class="summary-row">
+                    <span>Общо части:</span>
+                    <span id="totalParts">0.00 лв. (0.00 €)</span>
+                </div>
+                <div class="summary-row">
+                    <span>Общ труд:</span>
+                    <span id="totalLaborDisplay">0.00 лв. (0.00 €)</span>
+                </div>
+                <div class="summary-row summary-total">
+                    <span>КРАЙНА СУМА:</span>
+                    <span id="grandTotal">0.00 лв. (0.00 €)</span>
+                </div>
+            </div>
+
+            <!-- Бутони за действия -->
+            <div class="form-section">
+                <button class="btn btn-success" onclick="saveRepair()">Запази ремонт</button>
+                <button class="btn" onclick="printWorkOrder()">📋 Печат работна карта</button>
+                <button class="btn" onclick="printQuote()">💰 Печат оферта</button>
+                <button class="btn" onclick="printInvoice()">🧾 Печат фактура</button>
+                <button class="btn btn-info" onclick="clearForm()">🗑️ Изчисти формата</button>
+            </div>
+        </div>
+
+        <!-- Clients Tab -->
+        <div id="clients-tab" class="tab-content">
+            <div class="form-section">
+                <div class="section-title">👥 КЛИЕНТСКА БАЗА</div>
+                
+                <input type="text" id="searchClients" class="search-box" placeholder="Търси клиенти по име, телефон или рег. номер..." oninput="searchClients()">
+                
+                <div id="clientsList"></div>
+            </div>
+        </div>
+
+        <!-- Repairs Tab -->
+        <div id="repairs-tab" class="tab-content">
+            <div class="form-section">
+                <div class="section-title">🔧 ВСИЧКИ РЕМОНТИ</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="text" id="searchRepairs" class="search-box" placeholder="Търси ремонти по рег. номер, собственик или номер..." oninput="searchRepairs()">
+                    </div>
+                    <div class="form-group">
+                        <select id="filterStatus" onchange="filterRepairsByStatus()">
+                            <option value="">Всички статуси</option>
+                            <option value="received">Приети</option>
+                            <option value="in-progress">В работа</option>
+                            <option value="ready">Готови</option>
+                            <option value="delivered">Предадени</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="repairsList"></div>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports-tab" class="tab-content">
+            <div class="form-section">
+                <div class="section-title">📊 ОТЧЕТИ И СПРАВКИ</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>От дата:</label>
+                        <input type="date" id="reportFromDate">
+                    </div>
+                    <div class="form-group">
+                        <label>До дата:</label>
+                        <input type="date" id="reportToDate">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn" onclick="generateReport()">Генерирай отчет</button>
+                    </div>
+                </div>
+                
+                <div id="reportResults"></div>
+                
+                <div style="margin-top: 30px;">
+                    <button class="btn btn-success" onclick="exportAllData()">📤 Изтегли Backup</button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                    <button class="btn" onclick="document.getElementById('importFile').click()">📥 Качи Backup</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reminders Tab -->
+        <div id="reminders-tab" class="tab-content">
+            <div class="form-section">
+                <div class="section-title">⏰ НАПОМНЯНИЯ</div>
+                
+                <div id="remindersList"></div>
+                
+                <div style="margin-top: 20px;">
+                    <button class="btn" onclick="generateReminders()">🔄 Обнови напомняния</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal за детайли на клиент -->
+    <div id="clientDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeClientDetailsModal()">&times;</span>
+            <div id="clientDetailsContent"></div>
+        </div>
+    </div>
+
+    <!-- Modal за детайли на ремонт -->
+    <div id="repairDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRepairDetailsModal()">&times;</span>
+            <div id="repairDetailsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let parts = [];
+        let repairCounter = parseInt(localStorage.getItem('autoServiceCounter')) || 1;
+        let currentEditingRepairId = null;
+        
+        const EUR_RATE = 1.95583;
+
+        function convertToEUR(bgnAmount) {
+            return (bgnAmount / EUR_RATE).toFixed(2);
+        }
+
+        function formatDualPrice(bgnAmount) {
+            const eurAmount = convertToEUR(bgnAmount);
+            return `${bgnAmount.toFixed(2)} лв. (${eurAmount} €)`;
+        }
+
+        function getStatusText(status) {
+            const statusTexts = {
+                'received': 'Приет',
+                'in-progress': 'В работа',
+                'ready': 'Готов',
+                'delivered': 'Предаден'
+            };
+            return statusTexts[status] || status;
+        }
+
+        function getStatusClass(status) {
+            return `status-${status}`;
+        }
+
+        // Tab navigation
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Remove active class from all nav tabs
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load data for specific tabs
+            if (tabName === 'clients') {
+                loadClients();
+            } else if (tabName === 'repairs') {
+                loadRepairs();
+            } else if (tabName === 'reminders') {
+                generateReminders();
+            }
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('repairDate').value = new Date().toISOString().split('T')[0];
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('expectedDate').value = tomorrow.toISOString().split('T')[0];
+            
+            calculatePrices();
+            updateSummary();
+            loadClients();
+        });
+
+        // Client management
+        function saveClient(clientData) {
+            const clients = JSON.parse(localStorage.getItem('autoServiceClients')) || [];
+            const existingClientIndex = clients.findIndex(c => 
+                c.regNumber === clientData.regNumber || 
+                (c.phone && c.phone === clientData.phone)
+            );
+            
+            if (existingClientIndex >= 0) {
+                // Update existing client
+                clients[existingClientIndex] = {
+                    ...clients[existingClientIndex],
+                    ...clientData,
+                    lastVisit: new Date().toISOString()
+                };
+            } else {
+                // Add new client
+                clients.push({
+                    id: Date.now(),
+                    ...clientData,
+                    createdDate: new Date().toISOString(),
+                    lastVisit: new Date().toISOString()
+                });
+            }
+            
+            localStorage.setItem('autoServiceClients', JSON.stringify(clients));
+            return clients;
+        }
+
+        function searchExistingClient() {
+            const regNumber = document.getElementById('regNumber').value.trim();
+            if (!regNumber) {
+                document.getElementById('clientSuggestions').style.display = 'none';
+                return;
+            }
+
+            const clients = JSON.parse(localStorage.getItem('autoServiceClients')) || [];
+            const matches = clients.filter(client => 
+                client.regNumber.toLowerCase().includes(regNumber.toLowerCase())
+            );
+
+            const suggestions = document.getElementById('clientSuggestions');
+            if (matches.length > 0) {
+                suggestions.innerHTML = matches.map(client => `
+                    <div style="padding: 10px; cursor: pointer; border-bottom: 1px solid #eee;" 
+                         onclick="fillClientData('${client.id}')">
+                        <strong>${client.regNumber}</strong> - ${client.owner}
+                        ${client.phone ? ` - ${client.phone}` : ''}
+                    </div>
+                `).join('');
+                suggestions.style.display = 'block';
+            } else {
+                suggestions.style.display = 'none';
+            }
+        }
+
+        function fillClientData(clientId) {
+            const clients = JSON.parse(localStorage.getItem('autoServiceClients')) || [];
+            const client = clients.find(c => c.id == clientId);
+            
+            if (client) {
+                document.getElementById('regNumber').value = client.regNumber;
+                document.getElementById('vinNumber').value = client.vinNumber || '';
+                document.getElementById('owner').value = client.owner;
+                document.getElementById('phone').value = client.phone || '';
+                document.getElementById('clientSuggestions').style.display = 'none';
+            }
+        }
+
+        function loadClients() {
+            const clients = JSON.parse(localStorage.getItem('autoServiceClients')) || [];
+            displayClients(clients);
+        }
+
+        function displayClients(clients) {
+            const clientsList = document.getElementById('clientsList');
+            
+            if (clients.length === 0) {
+                clientsList.innerHTML = '<p>Няма записани клиенти.</p>';
+                return;
+            }
+
+            clientsList.innerHTML = clients.map(client => {
+                const repairs = getClientRepairs(client.id);
+                const lastRepair = repairs.length > 0 ? repairs[repairs.length - 1] : null;
+                
+                return `
+                    <div class="client-item" onclick="showClientDetails('${client.id}')">
+                        <div class="client-info">
+                            <strong>${client.owner}</strong><br>
+                            <span>${client.regNumber}${client.phone ? ` - ${client.phone}` : ''}</span><br>
+                            <small>
+                                Ремонти: ${repairs.length} | 
+                                Последен: ${lastRepair ? new Date(lastRepair.date).toLocaleDateString('bg-BG') : 'Няма'}
+                            </small>
+                        </div>
+                        <div>
+                            <button class="btn btn-info" onclick="event.stopPropagation(); createRepairForClient('${client.id}')">
+                                Нов ремонт
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function searchClients() {
+            const searchTerm = document.getElementById('searchClients').value.toLowerCase();
+            const clients = JSON.parse(localStorage.getItem('autoServiceClients')) || [];
+            
+            const filteredClients = clients.filter(client => 
+                client.owner.toLowerCase().includes(searchTerm) ||
+                client.regNumber.toLowerCase().includes(searchTerm) ||
+                (client.phone && client.phone.includes(searchTerm)) ||
+                (client.vinNumber && client.vinNumber.toLowerCase().includes(searchTerm))
+            );
+            
+            displayClients(filteredClients);
+        }
+
+        function getClientRepairs(clientId) {
+            const repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+            const clients = JSON.parse(localStorage.getItem('autoServiceClients')) || [];
+            const client = clients.find(c => c.id == clientId);
+            
+            if (!client) return [];
+            
+            return repairs.filter(repair => 
+                repair.vehicle.regNumber === client.regNumber ||
+                repair.vehicle.owner === client.owner
+            );
+        }
+
+        function showClientDetails(clientId) {
+            const clients = JSON.parse(localStorage.getItem('autoServiceClients')) || [];
+            const client = clients.find(c => c.id == clientId);
+            
+            if (!client) return;
+
+            const repairs = getClientRepairs(clientId);
+            const totalSpent = repairs.reduce((sum, repair) => sum + repair.totals.grandTotal, 0);
+
+            const content = document.getElementById('clientDetailsContent');
+            content.innerHTML = `
+                <h2>👤 ${client.owner}</h2>
+                
+                <div class="client-details">
+                    <h3>Информация за клиента:</h3>
+                    <p><strong>Регистрационен номер:</strong> ${client.regNumber}</p>
+                    <p><strong>VIN номер:</strong> ${client.vinNumber || 'Не е въведен'}</p>
+                    <p><strong>Телефон:</strong> ${client.phone || 'Не е въведен'}</p>
+                    <p><strong>Първо посещение:</strong> ${new Date(client.createdDate).toLocaleDateString('bg-BG')}</p>
+                    <p><strong>Последно посещение:</strong> ${new Date(client.lastVisit).toLocaleDateString('bg-BG')}</p>
+                    <p><strong>Общо харчене:</strong> ${formatDualPrice(totalSpent)}</p>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <button class="btn btn-success" onclick="createRepairForClient('${clientId}')">
+                        ➕ Нов ремонт
+                    </button>
+                    <button class="btn btn-info" onclick="scheduleReminder('${clientId}')">
+                        ⏰ Планирай напомняне
+                    </button>
+                </div>
+
+                <h3>История на ремонтите (${repairs.length}):</h3>
+                ${repairs.length > 0 ? repairs.reverse().map(repair => `
+                    <div class="repair-item" onclick="showRepairDetails(${repair.id})">
+                        <div class="repair-info">
+                            <strong>Ремонт #${repair.id}</strong>
+                            <span class="status-badge ${getStatusClass(repair.status)}">${getStatusText(repair.status)}</span><br>
+                            <span>${new Date(repair.date).toLocaleDateString('bg-BG')}</span><br>
+                            <small>${repair.vehicle.complaint || 'Няма описание'}</small>
+                        </div>
+                        <div class="repair-total">
+                            ${formatDualPrice(repair.totals.grandTotal)}
+                        </div>
+                    </div>
+                `).join('') : '<p>Няма записани ремонти за този клиент.</p>'}
+            `;
+            
+            document.getElementById('clientDetailsModal').style.display = 'block';
+        }
+
+        function createRepairForClient(clientId) {
+            const clients = JSON.parse(localStorage.getItem('autoServiceClients')) || [];
+            const client = clients.find(c => c.id == clientId);
+            
+            if (client) {
+                showTab('repair');
+                document.querySelector('.nav-tab').classList.remove('active');
+                document.querySelector('.nav-tab').classList.add('active');
+                
+                fillClientData(clientId);
+                closeClientDetailsModal();
+            }
+        }
+
+        // Repair management with status
+        function loadRepairs() {
+            const repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+            displayRepairs(repairs);
+        }
+
+        function displayRepairs(repairs) {
+            const repairsList = document.getElementById('repairsList');
+            
+            if (repairs.length === 0) {
+                repairsList.innerHTML = '<p>Няма записани ремонти.</p>';
+                return;
+            }
+
+            repairsList.innerHTML = repairs.reverse().map(repair => `
+                <div class="repair-item" onclick="showRepairDetails(${repair.id})">
+                    <div class="repair-info">
+                        <strong>Ремонт #${repair.id}</strong>
+                        <span class="status-badge ${getStatusClass(repair.status)}">${getStatusText(repair.status)}</span><br>
+                        <span>${repair.vehicle.regNumber} - ${repair.vehicle.owner}</span><br>
+                        <small>
+                            ${new Date(repair.date).toLocaleDateString('bg-BG')} | 
+                            ${repair.expectedDate ? `Очаквана: ${new Date(repair.expectedDate).toLocaleDateString('bg-BG')}` : ''}
+                        </small>
+                    </div>
+                    <div class="repair-total">
+                        ${formatDualPrice(repair.totals.grandTotal)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function searchRepairs() {
+            const searchTerm = document.getElementById('searchRepairs').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+            let repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+            
+            // Filter by search term
+            if (searchTerm) {
+                repairs = repairs.filter(repair => 
+                    repair.vehicle.regNumber.toLowerCase().includes(searchTerm) ||
+                    repair.vehicle.owner.toLowerCase().includes(searchTerm) ||
+                    repair.vehicle.vinNumber.toLowerCase().includes(searchTerm) ||
+                    repair.id.toString().includes(searchTerm)
+                );
+            }
+            
+            // Filter by status
+            if (statusFilter) {
+                repairs = repairs.filter(repair => repair.status === statusFilter);
+            }
+            
+            displayRepairs(repairs);
+        }
+
+        function filterRepairsByStatus() {
+            searchRepairs(); // Reuse the search function with status filter
+        }
+
+        function showRepairDetails(repairId) {
+            const repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+            const repair = repairs.find(r => r.id === repairId);
+            
+            if (!repair) return;
+
+            const content = document.getElementById('repairDetailsContent');
+            content.innerHTML = `
+                <h2>🔧 Ремонт #${repair.id}</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <span class="status-badge ${getStatusClass(repair.status)}">${getStatusText(repair.status)}</span>
+                    <button class="btn btn-warning" onclick="editRepair(${repair.id})" style="margin-left: 10px;">
+                        ✏️ Редактирай
+                    </button>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <button class="btn" onclick="printPastRepairInvoice(${repair.id})">🧾 Печат фактура</button>
+                    <button class="btn" onclick="printPastRepairWorkOrder(${repair.id})">📋 Печат работна карта</button>
+                    <button class="btn btn-danger" onclick="deleteRepair(${repair.id})">🗑️ Изтрий</button>
+                </div>
+
+                <div class="client-details">
+                    <h3>Информация за автомобила:</h3>
+                    <p><strong>Регистрационен номер:</strong> ${repair.vehicle.regNumber}</p>
+                    <p><strong>VIN номер:</strong> ${repair.vehicle.vinNumber || 'Не е въведен'}</p>
+                    <p><strong>Собственик:</strong> ${repair.vehicle.owner}</p>
+                    <p><strong>Телефон:</strong> ${repair.vehicle.phone || 'Не е въведен'}</p>
+                    <p><strong>Километри:</strong> ${repair.vehicle.kilometers}</p>
+                    <p><strong>Дата на ремонт:</strong> ${new Date(repair.vehicle.repairDate).toLocaleDateString('bg-BG')}</p>
+                    ${repair.expectedDate ? `<p><strong>Очаквана дата:</strong> ${new Date(repair.expectedDate).toLocaleDateString('bg-BG')}</p>` : ''}
+                    ${repair.vehicle.complaint ? `<p><strong>Оплакване/Проблем:</strong> ${repair.vehicle.complaint}</p>` : ''}
+                    ${repair.notes ? `<p><strong>Забележки:</strong> ${repair.notes}</p>` : ''}
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <h3>Актуализиране на статус:</h3>
+                    <select id="newStatus" style="padding: 8px; margin-right: 10px;">
+                        <option value="received" ${repair.status === 'received' ? 'selected' : ''}>Приет</option>
+                        <option value="in-progress" ${repair.status === 'in-progress' ? 'selected' : ''}>В работа</option>
+                        <option value="ready" ${repair.status === 'ready' ? 'selected' : ''}>Готов</option>
+                        <option value="delivered" ${repair.status === 'delivered' ? 'selected' : ''}>Предаден</option>
+                    </select>
+                    <button class="btn btn-success" onclick="updateRepairStatus(${repair.id})">
+                        Актуализирай статус
+                    </button>
+                </div>
+
+                <div class="client-details">
+                    <h3>Части:</h3>
+                    ${repair.parts.length > 0 ? repair.parts.map(part => `
+                        <div class="part-item">
+                            <div class="part-info">
+                                <strong>${part.description}</strong><br>
+                                ${part.partNumber ? `Номер: ${part.partNumber}<br>` : ''}
+                                ${part.supplier ? `Доставчик: ${part.supplier}<br>` : ''}
+                                Дребно: ${part.retailPrice.toFixed(2)} лв. | Едро: ${part.wholesalePrice.toFixed(2)} лв.
+                            </div>
+                            <div class="part-price">${formatDualPrice(part.finalPrice)}</div>
+                        </div>
+                    `).join('') : '<p>Няма добавени части.</p>'}
+                </div>
+
+                <div class="client-details">
+                    <h3>Труд:</h3>
+                    <p><strong>Часове:</strong> ${repair.labor.hoursWorked}</p>
+                    <p><strong>Цена за час:</strong> ${formatDualPrice(repair.labor.hourlyRate)}</p>
+                    <p><strong>Общо труд:</strong> ${formatDualPrice(repair.labor.totalLabor)}</p>
+                </div>
+
+                <div class="summary">
+                    <h3>Финансово резюме:</h3>
+                    <div class="summary-row">
+                        <span>Общо части:</span>
+                        <span>${formatDualPrice(repair.totals.totalParts)}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Общ труд:</span>
+                        <span>${formatDualPrice(repair.totals.laborCost)}</span>
+                    </div>
+                    <div class="summary-row summary-total">
+                        <span>КРАЙНА СУМА:</span>
+                        <span>${formatDualPrice(repair.totals.grandTotal)}</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('repairDetailsModal').style.display = 'block';
+        }
+
+        function updateRepairStatus(repairId) {
+            const newStatus = document.getElementById('newStatus').value;
+            const repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+            const repairIndex = repairs.findIndex(r => r.id === repairId);
+            
+            if (repairIndex >= 0) {
+                repairs[repairIndex].status = newStatus;
+                repairs[repairIndex].statusUpdated = new Date().toISOString();
+                localStorage.setItem('autoServiceRepairs', JSON.stringify(repairs));
+                
+                // Refresh the display
+                showRepairDetails(repairId);
+                loadRepairs();
+                
+                alert(`Статусът е актуализиран на "${getStatusText(newStatus)}"`);
+            }
+        }
+
+        function editRepair(repairId) {
+            const repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+            const repair = repairs.find(r => r.id === repairId);
+            
+            if (!repair) return;
+
+            // Fill the form with repair data
+            currentEditingRepairId = repairId;
+            
+            document.getElementById('regNumber').value = repair.vehicle.regNumber;
+            document.getElementById('vinNumber').value = repair.vehicle.vinNumber || '';
+            document.getElementById('owner').value = repair.vehicle.owner;
+            document.getElementById('phone').value = repair.vehicle.phone || '';
+            document.getElementById('kilometers').value = repair.vehicle.kilometers || '';
+            document.getElementById('repairStatus').value = repair.status;
+            document.getElementById('repairDate').value = repair.vehicle.repairDate;
+            document.getElementById('expectedDate').value = repair.expectedDate || '';
+            document.getElementById('complaint').value = repair.vehicle.complaint || '';
+            document.getElementById('notes').value = repair.notes || '';
+            
+            // Fill parts
+            parts = [...repair.parts];
+            updatePartsList();
+            
+            // Fill labor
+            document.getElementById('hoursWorked').value = repair.labor.hoursWorked || '';
+            document.getElementById('hourlyRate').value = repair.labor.hourlyRate || '';
+            document.getElementById('totalLabor').value = repair.labor.totalLabor || '';
+            
+            updateSummary();
+            
+            // Switch to repair tab
+            showTab('repair');
+            closeRepairDetailsModal();
+            
+            // Change save button text
+            const saveBtn = document.querySelector('.btn-success');
+            saveBtn.textContent = '💾 Актуализирай ремонт';
+            saveBtn.onclick = updateRepair;
+        }
+
+        // Parts management (same as before)
+        function calculatePrices() {
+            const retailPrice = parseFloat(document.getElementById('retailPrice').value) || 0;
+            const wholesalePrice = parseFloat(document.getElementById('wholesalePrice').value) || 0;
+            
+            let basePrice = retailPrice || wholesalePrice;
+            
+            document.getElementById('finalPrice').value = basePrice.toFixed(2);
+        }
+
+        document.getElementById('retailPrice').addEventListener('input', calculatePrices);
+        document.getElementById('wholesalePrice').addEventListener('input', calculatePrices);
+
+        function addPart() {
+            const description = document.getElementById('partDescription').value.trim();
+            const partNumber = document.getElementById('partNumber').value.trim();
+            const supplier = document.getElementById('partSupplier').value.trim();
+            const retailPrice = parseFloat(document.getElementById('retailPrice').value) || 0;
+            const wholesalePrice = parseFloat(document.getElementById('wholesalePrice').value) || 0;
+            const finalPrice = parseFloat(document.getElementById('finalPrice').value) || 0;
+
+            if (!description) {
+                alert('Моля въведете описание на частта!');
+                return;
+            }
+
+            if (retailPrice === 0 && wholesalePrice === 0) {
+                alert('Моля въведете цена на частта!');
+                return;
+            }
+
+            const part = {
+                id: Date.now(),
+                description,
+                partNumber,
+                supplier,
+                retailPrice,
+                wholesalePrice,
+                finalPrice
+            };
+
+            parts.push(part);
+            updatePartsList();
+            updateSummary();
+            clearPartForm();
+        }
+
+        function clearPartForm() {
+            document.getElementById('partDescription').value = '';
+            document.getElementById('partNumber').value = '';
+            document.getElementById('partSupplier').value = '';
+            document.getElementById('retailPrice').value = '';
+            document.getElementById('wholesalePrice').value = '';
+            document.getElementById('finalPrice').value = '';
+        }
+
+        function updatePartsList() {
+            const partsList = document.getElementById('partsList');
+            partsList.innerHTML = '';
+
+            parts.forEach(part => {
+                const partDiv = document.createElement('div');
+                partDiv.className = 'part-item';
+                partDiv.innerHTML = `
+                    <div class="part-info">
+                        <strong>${part.description}</strong><br>
+                        ${part.partNumber ? `<span style="color: #666; font-size: 0.9em;">Номер: ${part.partNumber}</span><br>` : ''}
+                        ${part.supplier ? `<em>Доставчик: ${part.supplier}</em><br>` : ''}
+                        Дребно: ${part.retailPrice.toFixed(2)} лв. | 
+                        Едро: ${part.wholesalePrice.toFixed(2)} лв.
+                    </div>
+                    <div class="part-price">${formatDualPrice(part.finalPrice)}</div>
+                    <button class="btn btn-danger" onclick="removePart(${part.id})">Премахни</button>
+                `;
+                partsList.appendChild(partDiv);
+            });
+        }
+
+        function removePart(partId) {
+            parts = parts.filter(part => part.id !== partId);
+            updatePartsList();
+            updateSummary();
+        }
+
+        function calculateLabor() {
+            const hours = parseFloat(document.getElementById('hoursWorked').value) || 0;
+            const rate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+            const total = hours * rate;
+            
+            document.getElementById('totalLabor').value = total.toFixed(2);
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const totalParts = parts.reduce((sum, part) => sum + part.finalPrice, 0);
+            const totalLabor = parseFloat(document.getElementById('totalLabor').value) || 0;
+            const grandTotal = totalParts + totalLabor;
+
+            document.getElementById('totalParts').textContent = formatDualPrice(totalParts);
+            document.getElementById('totalLaborDisplay').textContent = formatDualPrice(totalLabor);
+            document.getElementById('grandTotal').textContent = formatDualPrice(grandTotal);
+        }
+
+        function saveRepair() {
+            const regNumber = document.getElementById('regNumber').value.trim();
+            const owner = document.getElementById('owner').value.trim();
+
+            if (!regNumber || !owner) {
+                alert('Моля въведете поне регистрационен номер и собственик!');
+                return;
+            }
+
+            const totalParts = parts.reduce((sum, part) => sum + part.finalPrice, 0);
+            const laborCost = parseFloat(document.getElementById('totalLabor').value) || 0;
+            const hoursWorked = parseFloat(document.getElementById('hoursWorked').value) || 0;
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+
+            const clientData = {
+                regNumber: document.getElementById('regNumber').value.trim(),
+                vinNumber: document.getElementById('vinNumber').value.trim(),
+                owner: document.getElementById('owner').value.trim(),
+                phone: document.getElementById('phone').value.trim()
+            };
+
+            // Save client data
+            saveClient(clientData);
+
+            const repair = {
+                id: repairCounter++,
+                date: new Date().toISOString(),
+                status: document.getElementById('repairStatus').value,
+                expectedDate: document.getElementById('expectedDate').value || null,
+                vehicle: {
+                    regNumber: clientData.regNumber,
+                    vinNumber: clientData.vinNumber,
+                    owner: clientData.owner,
+                    phone: clientData.phone,
+                    kilometers: document.getElementById('kilometers').value.trim(),
+                    repairDate: document.getElementById('repairDate').value,
+                    complaint: document.getElementById('complaint').value.trim()
+                },
+                notes: document.getElementById('notes').value.trim(),
+                parts: [...parts],
+                labor: {
+                    hoursWorked,
+                    hourlyRate,
+                    totalLabor: laborCost
+                },
+                totals: {
+                    totalParts,
+                    laborCost,
+                    grandTotal: totalParts + laborCost
+                }
+            };
+
+            const repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+            repairs.push(repair);
+            localStorage.setItem('autoServiceRepairs', JSON.stringify(repairs));
+            localStorage.setItem('autoServiceCounter', repairCounter.toString());
+
+            alert(`Ремонт #${repair.id} е запазен успешно!`);
+            clearForm();
+            loadClients();
+        }
+
+        function updateRepair() {
+            if (!currentEditingRepairId) return;
+
+            const regNumber = document.getElementById('regNumber').value.trim();
+            const owner = document.getElementById('owner').value.trim();
+
+            if (!regNumber || !owner) {
+                alert('Моля въведете поне регистрационен номер и собственик!');
+                return;
+            }
+
+            const totalParts = parts.reduce((sum, part) => sum + part.finalPrice, 0);
+            const laborCost = parseFloat(document.getElementById('totalLabor').value) || 0;
+            const hoursWorked = parseFloat(document.getElementById('hoursWorked').value) || 0;
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+
+            const repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+            const repairIndex = repairs.findIndex(r => r.id === currentEditingRepairId);
+
+            if (repairIndex >= 0) {
+                const existingRepair = repairs[repairIndex];
+                
+                repairs[repairIndex] = {
+                    ...existingRepair,
+                    status: document.getElementById('repairStatus').value,
+                    expectedDate: document.getElementById('expectedDate').value || null,
+                    vehicle: {
+                        regNumber: document.getElementById('regNumber').value.trim(),
+                        vinNumber: document.getElementById('vinNumber').value.trim(),
+                        owner: document.getElementById('owner').value.trim(),
+                        phone: document.getElementById('phone').value.trim(),
+                        kilometers: document.getElementById('kilometers').value.trim(),
+                        repairDate: document.getElementById('repairDate').value,
+                        complaint: document.getElementById('complaint').value.trim()
+                    },
+                    notes: document.getElementById('notes').value.trim(),
+                    parts: [...parts],
+                    labor: {
+                        hoursWorked,
+                        hourlyRate,
+                        totalLabor: laborCost
+                    },
+                    totals: {
+                        totalParts,
+                        laborCost,
+                        grandTotal: totalParts + laborCost
+                    },
+                    lastModified: new Date().toISOString()
+                };
+
+                localStorage.setItem('autoServiceRepairs', JSON.stringify(repairs));
+
+                alert(`Ремонт #${currentEditingRepairId} е актуализиран успешно!`);
+                clearForm();
+                currentEditingRepairId = null;
+                
+                // Reset save button
+                const saveBtn = document.querySelector('.btn-success');
+                saveBtn.textContent = 'Запази ремонт';
+                saveBtn.onclick = saveRepair;
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('regNumber').value = '';
+            document.getElementById('vinNumber').value = '';
+            document.getElementById('owner').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('kilometers').value = '';
+            document.getElementById('repairStatus').value = 'received';
+            document.getElementById('repairDate').value = new Date().toISOString().split('T')[0];
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('expectedDate').value = tomorrow.toISOString().split('T')[0];
+            document.getElementById('complaint').value = '';
+            document.getElementById('notes').value = '';
+            document.getElementById('hoursWorked').value = '';
+            document.getElementById('hourlyRate').value = '';
+            document.getElementById('totalLabor').value = '';
+            document.getElementById('clientSuggestions').style.display = 'none';
+            
+            parts = [];
+            updatePartsList();
+            updateSummary();
+            clearPartForm();
+            currentEditingRepairId = null;
+            
+            // Reset save button
+            const saveBtn = document.querySelector('.btn-success');
+            saveBtn.textContent = 'Запази ремонт';
+            saveBtn.onclick = saveRepair;
+        }
+
+        function deleteRepair(repairId) {
+            if (confirm('Сигурни ли сте, че искате да изтриете този ремонт?')) {
+                let repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+                repairs = repairs.filter(repair => repair.id !== repairId);
+                localStorage.setItem('autoServiceRepairs', JSON.stringify(repairs));
+                closeRepairDetailsModal();
+                loadRepairs();
+                alert('Ремонтът е изтрит успешно!');
+            }
+        }
+
+        // Reminders system
+        function generateReminders() {
+            const repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+            const now = new Date();
+            const reminders = [];
+
+            repairs.forEach(repair => {
+                const repairDate = new Date(repair.vehicle.repairDate);
+                const daysSinceRepair = Math.floor((now - repairDate) / (1000 * 60 * 60 * 24));
+                
+                // Remind for service every 6 months (180 days)
+                if (daysSinceRepair >= 180 && repair.status === 'delivered') {
+                    const nextServiceDate = new Date(repairDate);
+                    nextServiceDate.setDate(nextServiceDate.getDate() + 180);
+                    
+                    reminders.push({
+                        type: 'service',
+                        clientName: repair.vehicle.owner,
+                        regNumber: repair.vehicle.regNumber,
+                        phone: repair.vehicle.phone,
+                        lastService: repairDate,
+                        nextService: nextServiceDate,
+                        daysPassed: daysSinceRepair,
+                        repairId: repair.id
+                    });
+                }
+
+                // Check for pending repairs (ready status for more than 3 days)
+                if (repair.status === 'ready') {
+                    const statusDate = repair.statusUpdated ? new Date(repair.statusUpdated) : new Date(repair.date);
+                    const daysReady = Math.floor((now - statusDate) / (1000 * 60 * 60 * 24));
+                    
+                    if (daysReady >= 3) {
+                        reminders.push({
+                            type: 'pickup',
+                            clientName: repair.vehicle.owner,
+                            regNumber: repair.vehicle.regNumber,
+                            phone: repair.vehicle.phone,
+                            daysReady: daysReady,
+                            repairId: repair.id
+                        });
+                    }
+                }
+            });
+
+            displayReminders(reminders);
+        }
+
+        function displayReminders(reminders) {
+            const remindersList = document.getElementById('remindersList');
+            
+            if (reminders.length === 0) {
+                remindersList.innerHTML = '<p>Няма напомняния в момента.</p>';
+                return;
+            }
+
+            remindersList.innerHTML = reminders.map(reminder => {
+                if (reminder.type === 'service') {
+                    return `
+                        <div class="reminder-item">
+                            <h4>🔧 Напомняне за сервиз</h4>
+                            <p><strong>Клиент:</strong> ${reminder.clientName} (${reminder.regNumber})</p>
+                            ${reminder.phone ? `<p><strong>Телефон:</strong> ${reminder.phone}</p>` : ''}
+                            <p><strong>Последен сервиз:</strong> ${reminder.lastService.toLocaleDateString('bg-BG')} (преди ${reminder.daysPassed} дни)</p>
+                            <p><strong>Препоръчан следващ сервиз:</strong> ${reminder.nextService.toLocaleDateString('bg-BG')}</p>
+                            <button class="btn btn-info" onclick="contactClient('${reminder.clientName}', '${reminder.phone}', 'service')">
+                                📞 Свържи се
+                            </button>
+                        </div>
+                    `;
+                } else if (reminder.type === 'pickup') {
+                    return `
+                        <div class="reminder-item">
+                            <h4>📋 Готов за вземане</h4>
+                            <p><strong>Клиент:</strong> ${reminder.clientName} (${reminder.regNumber})</p>
+                            ${reminder.phone ? `<p><strong>Телефон:</strong> ${reminder.phone}</p>` : ''}
+                            <p><strong>Готов от:</strong> ${reminder.daysReady} дни</p>
+                            <button class="btn btn-info" onclick="contactClient('${reminder.clientName}', '${reminder.phone}', 'pickup')">
+                                📞 Свържи се
+                            </button>
+                            <button class="btn btn-success" onclick="markAsDelivered(${reminder.repairId})">
+                                ✅ Маркирай като предаден
+                            </button>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        function contactClient(clientName, phone, type) {
+            const messages = {
+                service: `Здравейте ${clientName}, време е за следващия сервиз на вашия автомобил. Моля свържете се с нас за час.`,
+                pickup: `Здравейте ${clientName}, вашият автомобил е готов за вземане. Моля елате да го вземете.`
+            };
+
+            if (phone) {
+                // Try to open SMS app
+                const smsUrl = `sms:${phone}?body=${encodeURIComponent(messages[type])}`;
+                window.open(smsUrl, '_blank');
+            } else {
+                alert(`Няма записан телефон за ${clientName}. Съобщение: ${messages[type]}`);
+            }
+        }
+
+        function markAsDelivered(repairId) {
+            const repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+            const repairIndex = repairs.findIndex(r => r.id === repairId);
+            
+            if (repairIndex >= 0) {
+                repairs[repairIndex].status = 'delivered';
+                repairs[repairIndex].statusUpdated = new Date().toISOString();
+                localStorage.setItem('autoServiceRepairs', JSON.stringify(repairs));
+                
+                generateReminders(); // Refresh reminders
+                alert('Ремонтът е маркиран като предаден!');
+            }
+        }
+
+        // Reports
+        function generateReport() {
+            const fromDate = document.getElementById('reportFromDate').value;
+            const toDate = document.getElementById('reportToDate').value;
+            
+            if (!fromDate || !toDate) {
+                alert('Моля въведете и двете дати!');
+                return;
+            }
+
+            const repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+            const fromDateTime = new Date(fromDate).getTime();
+            const toDateTime = new Date(toDate).getTime() + 24 * 60 * 60 * 1000;
+
+            const filteredRepairs = repairs.filter(repair => {
+                const repairDate = new Date(repair.date).getTime();
+                return repairDate >= fromDateTime && repairDate < toDateTime;
+            });
+
+            let totalRevenue = 0;
+            let totalParts = 0;
+            let totalLabor = 0;
+            let statusCounts = { received: 0, 'in-progress': 0, ready: 0, delivered: 0 };
+
+            filteredRepairs.forEach(repair => {
+                totalRevenue += repair.totals.grandTotal;
+                totalParts += repair.totals.totalParts;
+                totalLabor += repair.totals.laborCost;
+                statusCounts[repair.status]++;
+            });
+
+            const resultsDiv = document.getElementById('reportResults');
+            resultsDiv.innerHTML = `
+                <div class="summary">
+                    <h3>📊 Отчет за периода ${new Date(fromDate).toLocaleDateString('bg-BG')} - ${new Date(toDate).toLocaleDateString('bg-BG')}</h3>
+                    
+                    <div class="summary-row">
+                        <span>Общо ремонти:</span>
+                        <span>${filteredRepairs.length}</span>
+                    </div>
+                    
+                    <h4 style="margin-top: 20px;">Статус на ремонтите:</h4>
+                    <div class="summary-row">
+                        <span>Приети:</span>
+                        <span>${statusCounts.received}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>В работа:</span>
+                        <span>${statusCounts['in-progress']}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Готови:</span>
+                        <span>${statusCounts.ready}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Предадени:</span>
+                        <span>${statusCounts.delivered}</span>
+                    </div>
+                    
+                    <h4 style="margin-top: 20px;">Финансов отчет:</h4>
+                    <div class="summary-row">
+                        <span>Общи приходи:</span>
+                        <span>${formatDualPrice(totalRevenue)}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Приходи от части:</span>
+                        <span>${formatDualPrice(totalParts)}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Приходи от труд:</span>
+                        <span>${formatDualPrice(totalLabor)}</span>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <p><strong>Среден ремонт:</strong> ${filteredRepairs.length > 0 ? formatDualPrice(totalRevenue / filteredRepairs.length) : '0.00 лв. (0.00 €)'}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Print functions (simplified versions)
+        function printWorkOrder() {
+            const regNumber = document.getElementById('regNumber').value.trim();
+            const owner = document.getElementById('owner').value.trim();
+
+            if (!regNumber || !owner) {
+                alert('Моля въведете поне регистрационен номер и собственик преди печат!');
+                return;
+            }
+
+            let partsTableHtml = '';
+            if (parts.length > 0) {
+                partsTableHtml = `
+                    <table class="print-table">
+                        <thead>
+                            <tr>
+                                <th>Описание</th>
+                                <th>Планирана цена</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                parts.forEach(part => {
+                    partsTableHtml += `
+                        <tr>
+                            <td>${part.description}</td>
+                            <td>${formatDualPrice(part.finalPrice)}</td>
+                        </tr>
+                    `;
+                });
+                
+                partsTableHtml += `
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            const printContent = `
+                <div class="print-only">
+                    <div class="print-header">
+                        <h1>SK AUTOMOTIVE</h1>
+                        <h2>РАБОТНА КАРТА</h2>
+                        <p>Дата: ${new Date().toLocaleDateString('bg-BG')} | Статус: ${getStatusText(document.getElementById('repairStatus').value)}</p>
+                    </div>
+                    
+                    <div class="print-section">
+                        <h3>ИНФОРМАЦИЯ ЗА АВТОМОБИЛА</h3>
+                        <div class="print-row">
+                            <span><strong>Регистрационен номер:</strong> ${regNumber}</span>
+                            <span><strong>VIN:</strong> ${document.getElementById('vinNumber').value || 'Не е въведен'}</span>
+                        </div>
+                        <div class="print-row">
+                            <span><strong>Собственик:</strong> ${owner}</span>
+                            <span><strong>Телефон:</strong> ${document.getElementById('phone').value || 'Не е въведен'}</span>
+                        </div>
+                        <div class="print-row">
+                            <span><strong>Километри:</strong> ${document.getElementById('kilometers').value || 'Не е въведен'}</span>
+                            <span><strong>Дата на приемане:</strong> ${document.getElementById('repairDate').value ? new Date(document.getElementById('repairDate').value).toLocaleDateString('bg-BG') : ''}</span>
+                        </div>
+                        ${document.getElementById('expectedDate').value ? `
+                        <div class="print-row">
+                            <span><strong>Очаквана дата:</strong> ${new Date(document.getElementById('expectedDate').value).toLocaleDateString('bg-BG')}</span>
+                        </div>
+                        ` : ''}
+                        ${document.getElementById('complaint').value ? `
+                        <div class="print-row">
+                            <span><strong>Оплакване/Проблем:</strong></span>
+                            <span>${document.getElementById('complaint').value}</span>
+                        </div>
+                        ` : ''}
+                        ${document.getElementById('notes').value ? `
+                        <div class="print-row">
+                            <span><strong>Забележки:</strong></span>
+                            <span>${document.getElementById('notes').value}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${parts.length > 0 ? `
+                    <div class="print-section">
+                        <h3>ПЛАНИРАНИ ЧАСТИ</h3>
+                        ${partsTableHtml}
+                    </div>
+                    ` : ''}
+                    
+                    <div class="print-section">
+                        <h3>ПЛАНИРАН ТРУД</h3>
+                        <div class="print-row">
+                            <span>Часове работа:</span>
+                            <span>${document.getElementById('hoursWorked').value || '0'}</span>
+                        </div>
+                        <div class="print-row">
+                            <span>Цена за час:</span>
+                            <span>${document.getElementById('hourlyRate').value ? formatDualPrice(parseFloat(document.getElementById('hourlyRate').value)) : '0.00 лв. (0.00 €)'}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 50px;">
+                        <div class="print-row">
+                            <span>Подпис клиент: _____________________</span>
+                            <span>Подпис механик: _____________________</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.querySelector('.container').classList.add('no-print');
+            const printDiv = document.createElement('div');
+            printDiv.innerHTML = printContent;
+            document.body.appendChild(printDiv);
+            
+            window.print();
+            
+            setTimeout(() => {
+                document.querySelector('.container').classList.remove('no-print');
+                document.body.removeChild(printDiv);
+            }, 100);
+        }
+
+        function printQuote() {
+            const regNumber = document.getElementById('regNumber').value.trim();
+            const owner = document.getElementById('owner').value.trim();
+
+            if (!regNumber || !owner) {
+                alert('Моля въведете поне регистрационен номер и собственик преди печат!');
+                return;
+            }
+
+            let partsTableHtml = '';
+            if (parts.length > 0) {
+                partsTableHtml = `
+                    <table class="print-table">
+                        <thead>
+                            <tr>
+                                <th>Описание</th>
+                                <th>Цена</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                parts.forEach(part => {
+                    partsTableHtml += `
+                        <tr>
+                            <td>${part.description}</td>
+                            <td>${formatDualPrice(part.finalPrice)}</td>
+                        </tr>
+                    `;
+                });
+                
+                partsTableHtml += `
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            const totalParts = parts.reduce((sum, part) => sum + part.finalPrice, 0);
+            const totalLabor = parseFloat(document.getElementById('totalLabor').value) || 0;
+            const grandTotal = totalParts + totalLabor;
+
+            const printContent = `
+                <div class="print-only">
+                    <div class="print-header">
+                        <h1>SK AUTOMOTIVE</h1>
+                        <h2>ОФЕРТА</h2>
+                        <p>Дата: ${new Date().toLocaleDateString('bg-BG')}</p>
+                    </div>
+                    
+                    <div class="print-section">
+                        <h3>ИНФОРМАЦИЯ ЗА АВТОМОБИЛА</h3>
+                        <div class="print-row">
+                            <span><strong>Регистрационен номер:</strong> ${regNumber}</span>
+                            <span><strong>VIN:</strong> ${document.getElementById('vinNumber').value || 'Не е въведен'}</span>
+                        </div>
+                        <div class="print-row">
+                            <span><strong>Собственик:</strong> ${owner}</span>
+                            <span><strong>Телефон:</strong> ${document.getElementById('phone').value || 'Не е въведен'}</span>
+                        </div>
+                        <div class="print-row">
+                            <span><strong>Километри:</strong> ${document.getElementById('kilometers').value || 'Не е въведен'}</span>
+                        </div>
+                        ${document.getElementById('complaint').value ? `
+                        <div class="print-row">
+                            <span><strong>Оплакване/Проблем:</strong></span>
+                            <span>${document.getElementById('complaint').value}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${parts.length > 0 ? `
+                    <div class="print-section">
+                        <h3>ПРЕДЛАГАНИ ЧАСТИ</h3>
+                        ${partsTableHtml}
+                    </div>
+                    ` : ''}
+                    
+                    ${totalLabor > 0 ? `
+                    <div class="print-section">
+                        <h3>ПРЕДЛАГАН ТРУД</h3>
+                        <div class="print-row">
+                            <span>Часове работа: ${document.getElementById('hoursWorked').value || '0'}</span>
+                            <span>Цена за час: ${document.getElementById('hourlyRate').value ? formatDualPrice(parseFloat(document.getElementById('hourlyRate').value)) : '0.00 лв. (0.00 €)'}</span>
+                        </div>
+                        <div class="print-row">
+                            <span><strong>Общо труд:</strong></span>
+                            <span><strong>${formatDualPrice(totalLabor)}</strong></span>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="print-section">
+                        <h3>ОБЩА ЦЕНА</h3>
+                        <div class="print-row">
+                            <span>Общо части:</span>
+                            <span>${formatDualPrice(totalParts)}</span>
+                        </div>
+                        <div class="print-row">
+                            <span>Общ труд:</span>
+                            <span>${formatDualPrice(totalLabor)}</span>
+                        </div>
+                        <div class="print-total" style="border-top: 2px solid #000; padding-top: 10px; margin-top: 10px;">
+                            <strong>ОБЩА ЦЕНА: ${formatDualPrice(grandTotal)}</strong>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; text-align: center; font-size: 10px; color: #666;">
+                        Офертата е валидна 30 дни от датата на издаване.
+                    </div>
+                </div>
+            `;
+
+            document.querySelector('.container').classList.add('no-print');
+            const printDiv = document.createElement('div');
+            printDiv.innerHTML = printContent;
+            document.body.appendChild(printDiv);
+            
+            window.print();
+            
+            setTimeout(() => {
+                document.querySelector('.container').classList.remove('no-print');
+                document.body.removeChild(printDiv);
+            }, 100);
+        }
+
+        function printInvoice() {
+            const regNumber = document.getElementById('regNumber').value.trim();
+            const owner = document.getElementById('owner').value.trim();
+
+            if (!regNumber || !owner) {
+                alert('Моля въведете поне регистрационен номер и собственик преди печат!');
+                return;
+            }
+
+            let partsTableHtml = '';
+            if (parts.length > 0) {
+                partsTableHtml = `
+                    <table class="print-table">
+                        <thead>
+                            <tr>
+                                <th>Описание</th>
+                                <th>Цена</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                parts.forEach(part => {
+                    partsTableHtml += `
+                        <tr>
+                            <td>${part.description}</td>
+                            <td>${formatDualPrice(part.finalPrice)}</td>
+                        </tr>
+                    `;
+                });
+                
+                partsTableHtml += `
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            const totalParts = parts.reduce((sum, part) => sum + part.finalPrice, 0);
+            const totalLabor = parseFloat(document.getElementById('totalLabor').value) || 0;
+            const grandTotal = totalParts + totalLabor;
+
+            const printContent = `
+                <div class="print-only">
+                    <div class="print-header">
+                        <h1>SK AUTOMOTIVE</h1>
+                        <h2>ФАКТУРА</h2>
+                        <p>Дата: ${new Date().toLocaleDateString('bg-BG')}</p>
+                    </div>
+                    
+                    <div class="print-section">
+                        <h3>ИНФОРМАЦИЯ ЗА АВТОМОБИЛА</h3>
+                        <div class="print-row">
+                            <span><strong>Регистрационен номер:</strong> ${regNumber}</span>
+                            <span><strong>VIN:</strong> ${document.getElementById('vinNumber').value || 'Не е въведен'}</span>
+                        </div>
+                        <div class="print-row">
+                            <span><strong>Собственик:</strong> ${owner}</span>
+                            <span><strong>Телефон:</strong> ${document.getElementById('phone').value || 'Не е въведен'}</span>
+                        </div>
+                        <div class="print-row">
+                            <span><strong>Километри:</strong> ${document.getElementById('kilometers').value || 'Не е въведен'}</span>
+                            <span><strong>Дата на ремонт:</strong> ${document.getElementById('repairDate').value ? new Date(document.getElementById('repairDate').value).toLocaleDateString('bg-BG') : ''}</span>
+                        </div>
+                        ${document.getElementById('complaint').value ? `
+                        <div class="print-row">
+                            <span><strong>Оплакване/Проблем:</strong></span>
+                            <span>${document.getElementById('complaint').value}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${parts.length > 0 ? `
+                    <div class="print-section">
+                        <h3>ЧАСТИ И МАТЕРИАЛИ</h3>
+                        ${partsTableHtml}
+                    </div>
+                    ` : ''}
+                    
+                    ${totalLabor > 0 ? `
+                    <div class="print-section">
+                        <h3>ТРУД</h3>
+                        <div class="print-row">
+                            <span>Часове работа: ${document.getElementById('hoursWorked').value || '0'}</span>
+                            <span>Цена за час: ${document.getElementById('hourlyRate').value ? formatDualPrice(parseFloat(document.getElementById('hourlyRate').value)) : '0.00 лв. (0.00 €)'}</span>
+                        </div>
+                        <div class="print-row">
+                            <span><strong>Общо труд:</strong></span>
+                            <span><strong>${formatDualPrice(totalLabor)}</strong></span>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="print-section">
+                        <h3>ФИНАНСОВО РЕЗЮМЕ</h3>
+                        <div class="print-row">
+                            <span>Общо части:</span>
+                            <span>${formatDualPrice(totalParts)}</span>
+                        </div>
+                        <div class="print-row">
+                            <span>Общ труд:</span>
+                            <span>${formatDualPrice(totalLabor)}</span>
+                        </div>
+                        <div class="print-total" style="border-top: 2px solid #000; padding-top: 10px; margin-top: 10px;">
+                            <strong>КРАЙНА СУМА: ${formatDualPrice(grandTotal)}</strong>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; text-align: center; font-size: 10px; color: #666;">
+                        Благодарим Ви за доверието! При въпроси се обръщайте към нас.
+                    </div>
+                </div>
+            `;
+
+            document.querySelector('.container').classList.add('no-print');
+            const printDiv = document.createElement('div');
+            printDiv.innerHTML = printContent;
+            document.body.appendChild(printDiv);
+            
+            window.print();
+            
+            setTimeout(() => {
+                document.querySelector('.container').classList.remove('no-print');
+                document.body.removeChild(printDiv);
+            }, 100);
+        }
+
+        // Print functions for past repairs
+        function printPastRepairInvoice(repairId) {
+            const repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+            const repair = repairs.find(r => r.id === repairId);
+            
+            if (!repair) {
+                alert('Ремонт не е намерен!');
+                return;
+            }
+            
+            let partsTableHtml = '';
+            if (repair.parts.length > 0) {
+                partsTableHtml = `
+                    <table class="print-table">
+                        <thead>
+                            <tr>
+                                <th>Описание</th>
+                                <th>Цена</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                repair.parts.forEach(part => {
+                    partsTableHtml += `
+                        <tr>
+                            <td>${part.description}</td>
+                            <td>${formatDualPrice(part.finalPrice)}</td>
+                        </tr>
+                    `;
+                });
+                
+                partsTableHtml += `
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            const printContent = `
+                <div class="print-only">
+                    <div class="print-header">
+                        <h1>SK AUTOMOTIVE</h1>
+                        <h2>ФАКТУРА</h2>
+                        <p>Номер: ${repair.id} | Дата: ${new Date(repair.date).toLocaleDateString('bg-BG')} | Статус: ${getStatusText(repair.status)}</p>
+                    </div>
+                    
+                    <div class="print-section">
+                        <h3>ИНФОРМАЦИЯ ЗА АВТОМОБИЛА</h3>
+                        <div class="print-row">
+                            <span><strong>Регистрационен номер:</strong> ${repair.vehicle.regNumber}</span>
+                            <span><strong>VIN:</strong> ${repair.vehicle.vinNumber || 'Не е въведен'}</span>
+                        </div>
+                        <div class="print-row">
+                            <span><strong>Собственик:</strong> ${repair.vehicle.owner}</span>
+                            <span><strong>Телефон:</strong> ${repair.vehicle.phone || 'Не е въведен'}</span>
+                        </div>
+                        <div class="print-row">
+                            <span><strong>Километри:</strong> ${repair.vehicle.kilometers || 'Не е въведен'}</span>
+                            <span><strong>Дата на ремонт:</strong> ${new Date(repair.vehicle.repairDate).toLocaleDateString('bg-BG')}</span>
+                        </div>
+                        ${repair.expectedDate ? `
+                        <div class="print-row">
+                            <span><strong>Очаквана дата:</strong> ${new Date(repair.expectedDate).toLocaleDateString('bg-BG')}</span>
+                        </div>
+                        ` : ''}
+                        ${repair.vehicle.complaint ? `
+                        <div class="print-row">
+                            <span><strong>Оплакване/Проблем:</strong></span>
+                            <span>${repair.vehicle.complaint}</span>
+                        </div>
+                        ` : ''}
+                        ${repair.notes ? `
+                        <div class="print-row">
+                            <span><strong>Забележки:</strong></span>
+                            <span>${repair.notes}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${repair.parts.length > 0 ? `
+                    <div class="print-section">
+                        <h3>ЧАСТИ И МАТЕРИАЛИ</h3>
+                        ${partsTableHtml}
+                    </div>
+                    ` : ''}
+                    
+                    ${repair.labor.totalLabor > 0 ? `
+                    <div class="print-section">
+                        <h3>ТРУД</h3>
+                        <div class="print-row">
+                            <span>Часове работа: ${repair.labor.hoursWorked}</span>
+                            <span>Цена за час: ${formatDualPrice(repair.labor.hourlyRate)}</span>
+                        </div>
+                        <div class="print-row">
+                            <span><strong>Общо труд:</strong></span>
+                            <span><strong>${formatDualPrice(repair.labor.totalLabor)}</strong></span>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="print-section">
+                        <h3>ФИНАНСОВО РЕЗЮМЕ</h3>
+                        <div class="print-row">
+                            <span>Общо части:</span>
+                            <span>${formatDualPrice(repair.totals.totalParts)}</span>
+                        </div>
+                        <div class="print-row">
+                            <span>Общ труд:</span>
+                            <span>${formatDualPrice(repair.totals.laborCost)}</span>
+                        </div>
+                        <div class="print-total" style="border-top: 2px solid #000; padding-top: 10px; margin-top: 10px;">
+                            <strong>КРАЙНА СУМА: ${formatDualPrice(repair.totals.grandTotal)}</strong>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; text-align: center; font-size: 10px; color: #666;">
+                        Благодарим Ви за доверието! При въпроси се обръщайте към нас.
+                    </div>
+                </div>
+            `;
+
+            document.querySelector('.container').classList.add('no-print');
+            const printDiv = document.createElement('div');
+            printDiv.innerHTML = printContent;
+            document.body.appendChild(printDiv);
+            
+            window.print();
+            
+            setTimeout(() => {
+                document.querySelector('.container').classList.remove('no-print');
+                document.body.removeChild(printDiv);
+            }, 100);
+        }
+
+        function printPastRepairWorkOrder(repairId) {
+            const repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+            const repair = repairs.find(r => r.id === repairId);
+            
+            if (!repair) {
+                alert('Ремонт не е намерен!');
+                return;
+            }
+            
+            let completedWorkHtml = '';
+            if (repair.parts.length > 0 || repair.labor.totalLabor > 0) {
+                completedWorkHtml = '<h3>ИЗПЪЛНЕНИ ДЕЙНОСТИ</h3>';
+                
+                if (repair.parts.length > 0) {
+                    completedWorkHtml += '<p><strong>Сменени части:</strong></p><ul>';
+                    repair.parts.forEach(part => {
+                        completedWorkHtml += `<li>${part.description} - ${formatDualPrice(part.finalPrice)}</li>`;
+                    });
+                    completedWorkHtml += '</ul>';
+                }
+                
+                if (repair.labor.totalLabor > 0) {
+                    completedWorkHtml += `<p><strong>Работа:</strong> ${repair.labor.hoursWorked} часа за ${formatDualPrice(repair.labor.totalLabor)}</p>`;
+                }
+            }
+            
+            const printContent = `
+                <div class="print-only">
+                    <div class="print-header">
+                        <h1>SK AUTOMOTIVE</h1>
+                        <h2>ПРИКЛЮЧЕНА РАБОТНА КАРТА</h2>
+                        <p>Номер: ${repair.id} | Дата: ${new Date(repair.date).toLocaleDateString('bg-BG')} | Статус: ${getStatusText(repair.status)}</p>
+                    </div>
+                    
+                    <div class="print-section">
+                        <h3>ИНФОРМАЦИЯ ЗА АВТОМОБИЛА</h3>
+                        <div class="print-row">
+                            <span><strong>Регистрационен номер:</strong> ${repair.vehicle.regNumber}</span>
+                            <span><strong>VIN:</strong> ${repair.vehicle.vinNumber || 'Не е въведен'}</span>
+                        </div>
+                        <div class="print-row">
+                            <span><strong>Собственик:</strong> ${repair.vehicle.owner}</span>
+                            <span><strong>Телефон:</strong> ${repair.vehicle.phone || 'Не е въведен'}</span>
+                        </div>
+                        <div class="print-row">
+                            <span><strong>Километри:</strong> ${repair.vehicle.kilometers || 'Не е въведен'}</span>
+                            <span><strong>Дата на приемане:</strong> ${new Date(repair.vehicle.repairDate).toLocaleDateString('bg-BG')}</span>
+                        </div>
+                        <div class="print-row">
+                            <span><strong>Дата на завършване:</strong> ${new Date(repair.date).toLocaleDateString('bg-BG')}</span>
+                            ${repair.expectedDate ? `<span><strong>Очаквана дата:</strong> ${new Date(repair.expectedDate).toLocaleDateString('bg-BG')}</span>` : ''}
+                        </div>
+                        ${repair.vehicle.complaint ? `
+                        <div class="print-row">
+                            <span><strong>Оплакване/Проблем:</strong></span>
+                            <span>${repair.vehicle.complaint}</span>
+                        </div>
+                        ` : ''}
+                        ${repair.notes ? `
+                        <div class="print-row">
+                            <span><strong>Забележки:</strong></span>
+                            <span>${repair.notes}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${completedWorkHtml}
+                    
+                    <div style="margin-top: 30px; text-align: center; font-size: 10px; color: #666;">
+                        Подпис клиент: _____________________&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Подпис механик: _____________________
+                    </div>
+                </div>
+            `;
+
+            document.querySelector('.container').classList.add('no-print');
+            const printDiv = document.createElement('div');
+            printDiv.innerHTML = printContent;
+            document.body.appendChild(printDiv);
+            
+            window.print();
+            
+            setTimeout(() => {
+                document.querySelector('.container').classList.remove('no-print');
+                document.body.removeChild(printDiv);
+            }, 100);
+        }
+
+        // Data export/import
+        function exportAllData() {
+            const repairs = JSON.parse(localStorage.getItem('autoServiceRepairs')) || [];
+            const clients = JSON.parse(localStorage.getItem('autoServiceClients')) || [];
+            const counter = localStorage.getItem('autoServiceCounter') || '1';
+            
+            const exportData = {
+                repairs: repairs,
+                clients: clients,
+                counter: counter,
+                exportDate: new Date().toISOString(),
+                version: '2.0'
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `sk_automotive_enhanced_backup_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    if (importedData.repairs && Array.isArray(importedData.repairs)) {
+                        if (confirm('Това ще замени всички съществуващи данни. Сигурни ли сте?')) {
+                            localStorage.setItem('autoServiceRepairs', JSON.stringify(importedData.repairs));
+                            
+                            if (importedData.clients && Array.isArray(importedData.clients)) {
+                                localStorage.setItem('autoServiceClients', JSON.stringify(importedData.clients));
+                            }
+                            
+                            if (importedData.counter) {
+                                localStorage.setItem('autoServiceCounter', importedData.counter);
+                                repairCounter = parseInt(importedData.counter);
+                            }
+                            
+                            alert('Данните са импортирани успешно!');
+                            loadClients();
+                            loadRepairs();
+                        }
+                    } else {
+                        alert('Невалиден формат на файла!');
+                    }
+                } catch (error) {
+                    alert('Грешка при четене на файла!');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Modal management
+        function closeClientDetailsModal() {
+            document.getElementById('clientDetailsModal').style.display = 'none';
+        }
+
+        function closeRepairDetailsModal() {
+            document.getElementById('repairDetailsModal').style.display = 'none';
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const clientModal = document.getElementById('clientDetailsModal');
+            const repairModal = document.getElementById('repairDetailsModal');
+            
+            if (event.target === clientModal) {
+                closeClientDetailsModal();
+            }
+            if (event.target === repairModal) {
+                closeRepairDetailsModal();
+            }
+        }
+
+        // Hide client suggestions when clicking elsewhere
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('#regNumber') && !event.target.closest('#clientSuggestions')) {
+                document.getElementById('clientSuggestions').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
